@@ -70,7 +70,7 @@ def main():
 
 
     while True:
-        clock.tick(5)
+        clock.tick(10)
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
