@@ -44,14 +44,23 @@ def wall_limit(snake_posit):
 
 
 def collision_snake_apple(c1, c2):
-    """This function generate the collision of the snake with the apple
+    """This method generate the collision of the snake with the apple
 
     """
     return c1[0] == c2[0] and c1[1] == c2[1]
 
 
+def collision_snake_body(snake_posit, snake_body):
+    """This method generate the collision of the snake with herself
+
+    """
+    if snake_posit in snake_body:
+        return 1
+    return 0
+
+
 def main():
-    """This function is responsible for run the game
+    """This method is responsible for run the game
 
     """
     pygame.init()
@@ -77,7 +86,8 @@ def main():
     clock = pygame.time.Clock()
 
     while True:
-        clock.tick(10)
+        clock.tick(20)
+ 
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
@@ -91,19 +101,18 @@ def main():
                     my_direction = RIGHT
                 if event.key == K_LEFT:
                     my_direction = LEFT
-
+        
         if collision_snake_apple(snake[0], apple_pos):
+            plus_one += 1
             apple_pos = on_grid_random()
             snake.append((0, 0))
-            plus_one += 1
 
         count = sysfont.render(str(plus_one), True, (255, 255, 255))
 
+
         if my_direction == UP:
             snake[0] = (snake[0][0], snake[0][1] - 10)
-            if wall_limit(snake[0]) != 0:
-                pygame.quit()
-
+            
         if my_direction == DOWN:
             snake[0] = (snake[0][0], snake[0][1] + 10)
 
@@ -113,15 +122,20 @@ def main():
         if my_direction == LEFT:
             snake[0] = (snake[0][0] - 10, snake[0][1])
 
+        if collision_snake_body(snake[0], snake[1:]) != 0:
+            pygame.quit()
+        
+        if wall_limit(snake[0]) != 0:
+                pygame.quit()
+
         for posit in range(len(snake) - 1, 0, -1):
             snake[posit] = (snake[posit - 1][0], snake[posit - 1][1])
-            if wall_limit(snake[posit]) != 0:
-                pygame.quit()
 
         screen.fill((0, 0, 0))
         screen.blit(score, (1, 1))
         screen.blit(count, (65, 1))
         screen.blit(apple, apple_pos)
+
         for position in snake:
             screen.blit(snake_skin, position)
 
