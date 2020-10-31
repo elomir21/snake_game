@@ -18,7 +18,7 @@ def wall_limit(snake_posit):
     """This method generate the wall limit
     :param snake_posit: position of snake
     :type snake_posit: tuple
-    :return: collision or not
+    :return: wall collision or not
     :rtype: int
     """
     if snake_posit > (600, -1):
@@ -38,30 +38,57 @@ def wall_limit(snake_posit):
     return 0
 
 
-def collision_snake_apple(snake, apple):
+def collision_snake_apple(snake_head, apple_posit):
     """This method generate the collision of the snake with the apple
-    :param snake: snake head
+    :param snake_head: snake head
     :type snake: tuple
-    :param apple: apple position on screen  
+    :param apple_posit: apple position on screen
     :type apple: tuple
     :return snake collision with apple
     :rtype: tuple
     """
-    return snake[0] == apple[0] and snake[1] == apple[1]
+    return snake_head[0] == apple_posit[0] and snake_head[1] == apple_posit[1]
 
 
-def collision_snake_body(snake_head, snake_body):
+def collision_snake_body(snake):
     """This method generate the collision of the snake with herself
-    :param snake_head: head of snake
-    :type snake_head: tuple
-    :param snake_body: body of snake
-    :type snake_body: list
+    :param snake: the snake body
+    :type snake: list
     :return snake collision with herself or not
     :rtype tuple
     """
-    if snake_head in snake_body:
+    if snake[0] in snake[1:]:
         return 1
     return 0
+
+
+def snake_direction(direction, snake, up, right, down, left):
+    """This method is responsible for move the snake on screen
+    :param direction: direction of snake
+    :type direction: int
+    :param snake: snake body
+    :type snake: list
+    :param up: up direction
+    :type up: int
+    :param right: right direction
+    :type right: int
+    :param down: down direction
+    :type down: int
+    :param left: left direction
+    :type left: int
+    """
+    if direction == up:
+        snake[0] = (snake[0][0], snake[0][1] - 10)
+
+    if direction == down:
+        snake[0] = (snake[0][0], snake[0][1] + 10)
+
+    if direction == right:
+        snake[0] = (snake[0][0] + 10, snake[0][1])
+
+    if direction == left:
+        snake[0] = (snake[0][0] - 10, snake[0][1])
+
 
 def run(screen, snake, snake_skin, apple, apple_pos, sysfont, score):
     """This method is responsible for run the game
@@ -78,7 +105,7 @@ def run(screen, snake, snake_skin, apple, apple_pos, sysfont, score):
     :param sysfont: the font render of the game
     :type sysfont: tuple
     :param score: the score of the game
-    :type score: tuple 
+    :type score: tuple
     """
     UP = 0
     RIGHT = 1
@@ -87,25 +114,25 @@ def run(screen, snake, snake_skin, apple, apple_pos, sysfont, score):
 
     my_direction = LEFT
     plus_one = 0
-    
+
     clock = pygame.time.Clock()
 
     while True:
         clock.tick(20)
- 
+
         for event in pygame.event.get():
             if event.type == QUIT:
                 pygame.quit()
             if event.type == KEYDOWN:
-                if event.key == K_UP:
+                if event.key == K_UP and my_direction is not DOWN:
                     my_direction = UP
-                if event.key == K_DOWN:
+                if event.key == K_DOWN and my_direction is not UP:
                     my_direction = DOWN
-                if event.key == K_RIGHT:
+                if event.key == K_RIGHT and my_direction is not LEFT:
                     my_direction = RIGHT
-                if event.key == K_LEFT:
+                if event.key == K_LEFT and my_direction is not RIGHT:
                     my_direction = LEFT
-        
+
         if collision_snake_apple(snake[0], apple_pos):
             plus_one += 1
             apple_pos = on_grid_random()
@@ -114,23 +141,14 @@ def run(screen, snake, snake_skin, apple, apple_pos, sysfont, score):
         points = sysfont.render(str(plus_one), True, (255, 255, 255))
 
 
-        if my_direction == UP:
-            snake[0] = (snake[0][0], snake[0][1] - 10)
-            
-        if my_direction == DOWN:
-            snake[0] = (snake[0][0], snake[0][1] + 10)
+        snake_direction(my_direction, snake, UP, RIGHT, DOWN, LEFT)
 
-        if my_direction == RIGHT:
-            snake[0] = (snake[0][0] + 10, snake[0][1])
 
-        if my_direction == LEFT:
-            snake[0] = (snake[0][0] - 10, snake[0][1])
-
-        if collision_snake_body(snake[0], snake[1:]) != 0:
+        if collision_snake_body(snake) != 0:
             pygame.quit()
-        
+
         if wall_limit(snake[0]) != 0:
-                pygame.quit()
+            pygame.quit()
 
         for posit in range(len(snake) - 1, 0, -1):
             snake[posit] = (snake[posit - 1][0], snake[posit - 1][1])
