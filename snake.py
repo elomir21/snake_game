@@ -4,14 +4,16 @@ from pygame.locals import *
 from pygame import font as pygame_font
 
 
-def on_grid_random():
+def on_grid_random(score_posit, points_posit):
     """This method generate the aleatory position of apple
     :retun apple position on screen
     :rtype tuple
     """
     x = random.randint(0, 590)
     y = random.randint(0, 590)
-    return x // 10 * 10, y // 10 * 10
+
+    if (x, y) not in score_posit and (x, y) not in points_posit:
+        return x // 10 * 10, y // 10 * 10
 
 
 def wall_limit(snake_posit):
@@ -90,7 +92,11 @@ def snake_direction(direction, snake, up, right, down, left):
         snake[0] = (snake[0][0] - 10, snake[0][1])
 
 
-def run(screen, snake, snake_skin, apple, apple_pos, sysfont, score):
+def run(
+        screen, snake, snake_skin,
+        apple, apple_pos, sysfont,
+        score, score_posit, points_posit
+):
     """This method is responsible for run the game
     :param screen: the game screen
     :type screen: tuple
@@ -106,6 +112,10 @@ def run(screen, snake, snake_skin, apple, apple_pos, sysfont, score):
     :type sysfont: tuple
     :param score: the score of the game
     :type score: tuple
+    :param score_posit: position of score on screen
+    :type score_posit: tuple
+    :param points_posit position of points on screen
+    :type points_posit tuple
     """
     UP = 0
     RIGHT = 1
@@ -135,7 +145,7 @@ def run(screen, snake, snake_skin, apple, apple_pos, sysfont, score):
 
         if collision_snake_apple(snake[0], apple_pos):
             plus_one += 1
-            apple_pos = on_grid_random()
+            apple_pos = on_grid_random(score_posit, points_posit)
             snake.append((0, 0))
 
         points = sysfont.render(str(plus_one), True, (255, 255, 255))
@@ -154,8 +164,8 @@ def run(screen, snake, snake_skin, apple, apple_pos, sysfont, score):
             snake[posit] = (snake[posit - 1][0], snake[posit - 1][1])
 
         screen.fill((0, 0, 0))
-        screen.blit(score, (1, 1))
-        screen.blit(points, (65, 1))
+        screen.blit(score, score_posit)
+        screen.blit(points, points_posit)
         screen.blit(apple, apple_pos)
 
         for position in snake:
@@ -176,16 +186,22 @@ def main():
     snake_skin = pygame.Surface((10, 10))
     snake_skin.fill((255, 255, 255))
 
-    apple_pos = on_grid_random()
-    apple = pygame.Surface((10, 10))
-    apple.fill((255, 0, 0))
-
     pygame_font.init()
     sysfont = pygame_font.Font(None, 30)
     screen.fill((10, 10, 10))
     score = sysfont.render('score: ', True, (255, 255, 255))
+    score_posit = (1, 1)
+    points_posit = (65, 1)
 
-    run(screen, snake, snake_skin, apple, apple_pos, sysfont, score)
+    apple_pos = on_grid_random(score_posit, points_posit)
+    apple = pygame.Surface((10, 10))
+    apple.fill((255, 0, 0))
+
+    run(
+        screen, snake, snake_skin,
+        apple, apple_pos, sysfont,
+        score, score_posit, points_posit
+    )
 
 
 if __name__ == '__main__':
