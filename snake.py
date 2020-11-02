@@ -4,16 +4,15 @@ from pygame.locals import *
 from pygame import font as pygame_font
 
 
-def on_grid_random(score_posit, points_posit):
+def on_grid_random():
     """This method generate the aleatory position of apple
     :retun apple position on screen
     :rtype tuple
     """
-    x = random.randint(0, 590)
-    y = random.randint(0, 590)
+    x = random.randint(40, 590)
+    y = random.randint(40, 590)
 
-    if (x, y) not in score_posit and (x, y) not in points_posit:
-        return x // 10 * 10, y // 10 * 10
+    return x // 10 * 10, y // 10 * 10
 
 
 def wall_limit(snake_posit):
@@ -23,19 +22,19 @@ def wall_limit(snake_posit):
     :return: wall collision or not
     :rtype: int
     """
-    if snake_posit > (600, -1):
+    if snake_posit > (590, -1):
         return 1
-    if snake_posit > (600, 600):
+    if snake_posit > (590, 590):
         return 1
-    if snake_posit < (-1, -1):
+    if snake_posit < (0, -1):
         return 1
-    if snake_posit < (-1, 600):
+    if snake_posit < (0, 590):
         return 1
 
-    for x_posit in range(0, 600):
-        if snake_posit == (x_posit, 600):
+    for x_posit in range(0, 590):
+        if snake_posit == (x_posit, 590):
             return 1
-        if snake_posit == (x_posit, -10):
+        if snake_posit == (x_posit, 30):
             return 1
     return 0
 
@@ -93,7 +92,7 @@ def snake_direction(direction, snake, up, right, down, left):
 
 
 def run(
-        screen, snake, snake_skin,
+        screen, frame, snake, snake_skin,
         apple, apple_pos, sysfont,
         score, score_posit, points_posit
 ):
@@ -128,7 +127,7 @@ def run(
     clock = pygame.time.Clock()
 
     while True:
-        clock.tick(20)
+        clock.tick(15)
 
         for event in pygame.event.get():
             if event.type == QUIT:
@@ -145,7 +144,7 @@ def run(
 
         if collision_snake_apple(snake[0], apple_pos):
             plus_one += 1
-            apple_pos = on_grid_random(score_posit, points_posit)
+            apple_pos = on_grid_random()
             snake.append((0, 0))
 
         points = sysfont.render(str(plus_one), True, (255, 255, 255))
@@ -155,21 +154,32 @@ def run(
 
 
         if collision_snake_body(snake) != 0:
+            screen.blit(frame, (limit, 600))
             pygame.quit()
 
         if wall_limit(snake[0]) != 0:
             pygame.quit()
 
+
         for posit in range(len(snake) - 1, 0, -1):
             snake[posit] = (snake[posit - 1][0], snake[posit - 1][1])
 
         screen.fill((0, 0, 0))
-        screen.blit(score, score_posit)
-        screen.blit(points, points_posit)
-        screen.blit(apple, apple_pos)
+
+        for limit in range(590):
+            screen.blit(frame, (limit, 590))
+            screen.blit(frame, (limit -9, 30))
+
+        for up in range(30, 590):
+            screen.blit(frame, (590, up))
+            screen.blit(frame, (0, up))
 
         for position in snake:
             screen.blit(snake_skin, position)
+
+        screen.blit(score, score_posit)
+        screen.blit(points, points_posit)
+        screen.blit(apple, apple_pos)
 
         pygame.display.update()
 
@@ -182,9 +192,12 @@ def main():
     screen = pygame.display.set_mode((600, 600))
     pygame.display.set_caption('snake game')
 
+    frame = pygame.Surface((10, 10))
+    frame.fill((0, 0, 255))
+
     snake = [(200, 200), (210, 200), (220, 200)]
     snake_skin = pygame.Surface((10, 10))
-    snake_skin.fill((255, 255, 255))
+    snake_skin.fill((255, 255, 0))
 
     pygame_font.init()
     sysfont = pygame_font.Font(None, 30)
@@ -193,12 +206,13 @@ def main():
     score_posit = (1, 1)
     points_posit = (65, 1)
 
-    apple_pos = on_grid_random(score_posit, points_posit)
+    apple_pos = on_grid_random()
     apple = pygame.Surface((10, 10))
     apple.fill((255, 0, 0))
 
+
     run(
-        screen, snake, snake_skin,
+        screen, frame, snake, snake_skin,
         apple, apple_pos, sysfont,
         score, score_posit, points_posit
     )
