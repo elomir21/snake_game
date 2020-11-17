@@ -90,6 +90,72 @@ def snake_direction(direction, snake, up, right, down, left):
     if direction == left:
         snake[0] = (snake[0][0] - 10, snake[0][1])
 
+def game_over(points):
+    """This method show game over screen
+    :param points: hited points
+    :type points: int
+    """
+
+    while True:
+
+        pygame.init
+        screen = pygame.display.set_mode((400, 200))
+        pygame.display.set_caption('GAME OVER')
+
+        pygame_font.init()
+        sysfont = pygame_font.Font(None, 50)
+        sysfont_score = pygame_font.Font(None, 30)
+        screen.fill((10, 10, 10))
+
+        game_over = sysfont.render('GAME OVER', True, (255, 0, 0))
+        game_over_posit = (85, 20)
+        score = sysfont_score.render('SCORE: ', True, (0, 0, 255))
+        score_posit = (145, 70)
+
+        color_font_button = (0, 0, 0)
+        color_light = (170, 170, 170)
+        shade_button = (255, 255, 0)
+        sysfont_button = pygame_font.Font(None, 30)
+
+        exit_width = screen.get_width()
+        exit_height = screen.get_height()
+        exit_button = sysfont_button.render('EXIT', True, color_font_button)
+
+        new_game_width = screen.get_width() - 20
+        new_game_height = screen.get_height()
+        new_game_button = sysfont_button.render('NEW GAME', True, color_font_button)
+
+        points_posit = (230, 70)
+
+        mouse = pygame.mouse.get_pos()
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if exit_width/2 <= mouse[0] <= exit_width/2 + 170 and exit_height/2 <= mouse[1] <= exit_height/2 + 40:
+                    pygame.quit()
+                if new_game_width/2 - 170 <= mouse[0] <= new_game_width/2 and new_game_height/2 <= mouse[1] <= new_game_height/2 + 40:
+                    pygame.quit()
+                    main()
+
+        if exit_width/2 <= mouse[0] <= exit_width/2 + 170 and exit_height/2 <= mouse[1] <= exit_height/2 + 40:
+            pygame.draw.rect(screen, color_light, [exit_width/2, exit_height/2, 170, 40])
+        else:
+            pygame.draw.rect(screen, shade_button, [exit_width/2, exit_height/2, 170, 40])
+
+        if new_game_width/2-170 <= mouse[0] <= new_game_width/2 and new_game_height/2  <= mouse[1] <= new_game_height/2 + 40:
+            pygame.draw.rect(screen, color_light, [new_game_width/2, new_game_height/2, -170, 40])
+        else:
+            pygame.draw.rect(screen, shade_button, [new_game_width/2, new_game_height/2, -170, 40])
+
+        screen.blit(game_over, game_over_posit)
+        screen.blit(score, score_posit)
+        screen.blit(points, points_posit)
+        screen.blit(exit_button, (exit_width/2 + 60, exit_height/2 + 10))
+        screen.blit(new_game_button, (new_game_width/2 - 140, new_game_height/2 + 10))
+        pygame.display.update()
+
 
 def run(
         screen, frame, snake, snake_skin,
@@ -156,9 +222,11 @@ def run(
         if collision_snake_body(snake) != 0:
             screen.blit(frame, (limit, 600))
             pygame.quit()
+            game_over(points)
 
         if wall_limit(snake[0]) != 0:
             pygame.quit()
+            game_over(points)
 
 
         for posit in range(len(snake) - 1, 0, -1):
@@ -202,9 +270,9 @@ def main():
     pygame_font.init()
     sysfont = pygame_font.Font(None, 30)
     screen.fill((10, 10, 10))
-    score = sysfont.render('score: ', True, (255, 255, 255))
-    score_posit = (1, 1)
-    points_posit = (65, 1)
+    score = sysfont.render('SCORE: ', True, (255, 255, 0))
+    score_posit = (1, 5)
+    points_posit = (85, 5)
 
     apple_pos = on_grid_random()
     apple = pygame.Surface((10, 10))
