@@ -9,8 +9,8 @@ def on_grid_random():
     :retun apple position on screen
     :rtype tuple
     """
-    x = random.randint(40, 580)
-    y = random.randint(40, 580)
+    x = random.randint(40, 570)
+    y = random.randint(40, 570)
 
     return x // 10 * 10, y // 10 * 10
 
