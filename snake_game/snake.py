@@ -1,3 +1,4 @@
+import os
 import pygame
 import random
 from pygame.locals import *
@@ -89,6 +90,27 @@ def snake_direction(direction, snake, up, right, down, left):
 
     if direction == left:
         snake[0] = (snake[0][0] - 10, snake[0][1])
+
+
+def store_best_score(points):
+    """This method store the best score of the game
+    :param points: the best score of the game
+    :type points: int
+    """
+    score_point = 0
+    score_point += points
+
+    if os.stat('../data/best_score.txt').st_size > 0:
+        with open('../data/best_score.txt', 'r') as last_score:
+            score = last_score.read()
+
+            if score_point > int(score):
+                with open('../data/best_score.txt', 'w+') as best_score:
+                    best_score.write(str(score_point) + '\n')
+    else:
+        with open('../data/best_score.txt', 'w+') as init_score:
+            init_score.write('1\n')
+
 
 def game_over(points):
     """This method show game over screen
@@ -196,17 +218,24 @@ def run(
         clock.tick(15)
 
         for event in pygame.event.get():
+
             if event.type == QUIT:
                 pygame.quit()
+
             if event.type == KEYDOWN:
+
                 if event.key == K_UP and my_direction is not DOWN:
                     my_direction = UP
+
                 if event.key == K_DOWN and my_direction is not UP:
                     my_direction = DOWN
+
                 if event.key == K_RIGHT and my_direction is not LEFT:
                     my_direction = RIGHT
+
                 if event.key == K_LEFT and my_direction is not RIGHT:
                     my_direction = LEFT
+
 
         if collision_snake_apple(snake[0], apple_pos):
             plus_one += 1
@@ -214,6 +243,7 @@ def run(
             snake.append((0, 0))
 
         points = sysfont.render(str(plus_one), True, (255, 255, 255))
+        store_best_score(plus_one)
 
 
         snake_direction(my_direction, snake, UP, RIGHT, DOWN, LEFT)
