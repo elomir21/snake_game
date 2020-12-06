@@ -5,6 +5,80 @@ from pygame.locals import *
 from pygame import font as pygame_font
 
 
+def initial_screen():
+    """This method show initial screen
+
+    """
+    scored_points = ''
+    if os.stat('../data/best_score.txt').st_size > 0:
+            with open('../data/best_score.txt', 'r') as last_score:
+                scored_points = last_score.read()
+
+    while True:
+
+        pygame.init
+        screen = pygame.display.set_mode((400, 500))
+        pygame.display.set_caption('SNAKE GAME')
+
+        pygame_font.init()
+        sysfont_title = pygame_font.Font(None, 50)
+        sysfont_best_score = pygame_font.Font(None, 30)
+        screen.fill((10, 10, 10))
+
+        snake_game = sysfont_title.render('SNAKE GAME', True, (0, 0, 255))
+        snake_game_posit = (85, 50)
+        best_score = sysfont_best_score.render('BEST SCORE: ', True, (255, 255, 255))
+        best_score_posit = (125, 120)
+
+        color_font_button = (0, 0, 0)
+        color_light = (170, 170, 170)
+        shade_button = (255, 255, 0)
+        sysfont_button = pygame_font.Font(None, 30)
+
+        exit_width = screen.get_width() + 170
+        exit_height = screen.get_height()
+        exit_button = sysfont_button.render('EXIT', True, color_font_button)
+
+        new_game_width = screen.get_width() + 170
+        new_game_height = screen.get_height()
+        new_game_button = sysfont_button.render('NEW GAME', True, color_font_button)
+
+        points = sysfont_best_score.render(scored_points.strip('\n'), True, (255, 255, 255))
+        points_posit = (270, 120)
+
+        mouse = pygame.mouse.get_pos()
+
+        for event in pygame.event.get():
+            if event.type == QUIT:
+                pygame.quit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if new_game_width/2-170 <= mouse[0] <= new_game_width/2 and new_game_height/2  <= mouse[1] <= new_game_height/2 + 40:
+                    main()
+
+                if exit_width/2 - 170 <= mouse[0] <= exit_width/2 and exit_height/2+50 <= mouse[1] <= exit_height/2 + 90:
+                    pygame.quit()
+
+        if new_game_width/2-170 <= mouse[0] <= new_game_width/2 and new_game_height/2  <= mouse[1] <= new_game_height/2 + 40:
+            pygame.draw.rect(screen, color_light, [new_game_width/2, new_game_height/2, -170, 40])
+        else:
+            pygame.draw.rect(screen, shade_button, [new_game_width/2, new_game_height/2, -170, 40])
+
+        if exit_width/2 - 170 <= mouse[0] <= exit_width/2 and exit_height/2+50 <= mouse[1] <= exit_height/2 + 90:
+            pygame.draw.rect(screen, color_light, [exit_width/2, exit_height/2+50, -170, 40])
+        else:
+            pygame.draw.rect(screen, shade_button, [exit_width/2, exit_height/2+50, -170, 40])
+
+        screen.blit(snake_game, snake_game_posit)
+        screen.blit(best_score, best_score_posit)
+        screen.blit(points, points_posit)
+        screen.blit(new_game_button, (new_game_width/2 - 140, new_game_height/2 + 10))
+        screen.blit(exit_button, (exit_width/2 - 110, exit_height/2 + 60))
+
+
+        pygame.display.update()
+
+
 def on_grid_random():
     """This method generate the aleatory position of apple
     :retun apple position on screen
@@ -317,4 +391,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    initial_screen()
